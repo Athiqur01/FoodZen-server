@@ -41,6 +41,13 @@ async function run() {
         res.send(result)
     })
 
+    // app.get('/user/:id', async (req,res)=>{
+    //     const id=req.params.id;
+    //     const quary={_id:new ObjectId(id)}
+    //     const user= await userCollection.findOne(quary) 
+    //     res.send(user)
+    // })
+
     app.post("/food", async (req,res)=>{
         const newfood=req.body
         console.log(newfood)
