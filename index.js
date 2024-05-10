@@ -10,7 +10,6 @@ app.use(cors())
 app.use(express.json())
 
 // Database integration
-
 console.log(process.env.DB_PASS)
 const uri = `mongodb+srv://${process.env.DB_User}:${process.env.DB_PASS}@cluster0.mnncxar.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
@@ -26,13 +25,43 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    const foodCollection = client.db("codeZen").collection('food');
+    const userCollection = client.db("codeZen").collection('user');
+    
+    app.get('/food', async (req,res)=>{
+        const cursor=foodCollection.find();
+        const result=await cursor.toArray();
+        console.log(result)
+        res.send(result)
+    })
+    app.get('/user', async (req,res)=>{
+        const cursor=userCollection.find();
+        const result=await cursor.toArray();
+        console.log(result)
+        res.send(result)
+    })
+
+    app.post("/food", async (req,res)=>{
+        const newfood=req.body
+        console.log(newfood)
+        
+        const result= await foodCollection.insertOne(newfood) 
+        res.send(result)
+    })
+    app.post("/user", async (req,res)=>{
+        const newUser=req.body
+        console.log(newUser)
+        
+        const result= await userCollection.insertOne(newUser) 
+        res.send(result)
+    })
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
