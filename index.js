@@ -56,6 +56,16 @@ async function run() {
         res.send(singleFood)
     })
 
+    app.get('/myFoodRequest/:email', async (req,res)=>{
+
+        const email=req.params.email;
+        const quary={userEmail:email}
+        console.log(quary)
+        const singleFood= await myFoodRequestCollection.find(quary) 
+        const result=await singleFood.toArray();
+        res.send(result)
+    })
+
    
 
 
