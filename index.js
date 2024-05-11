@@ -27,6 +27,7 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     const foodCollection = client.db("codeZen").collection('food');
     const userCollection = client.db("codeZen").collection('user');
+    const myFoodRequestCollection = client.db("codeZen").collection('myFoodRequest');
     
     app.get('/food', async (req,res)=>{
         const cursor=foodCollection.find();
@@ -64,6 +65,13 @@ async function run() {
         console.log(newfood)
         
         const result= await foodCollection.insertOne(newfood) 
+        res.send(result)
+    })
+    app.post("/myFoodRequest", async (req,res)=>{
+        const newfood=req.body
+        console.log(newfood)
+        
+        const result= await myFoodRequestCollection.insertOne(newfood) 
         res.send(result)
     })
 
