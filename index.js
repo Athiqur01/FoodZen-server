@@ -1,6 +1,6 @@
 const express=require('express');
 const cors=require('cors')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion,ObjectId } = require('mongodb');
 require('dotenv').config()
 const app=express()
 const port=process.env.PORT || 5014
@@ -41,12 +41,23 @@ async function run() {
         res.send(result)
     })
 
-    // app.get('/user/:id', async (req,res)=>{
-    //     const id=req.params.id;
-    //     const quary={_id:new ObjectId(id)}
-    //     const user= await userCollection.findOne(quary) 
-    //     res.send(user)
-    // })
+    app.get('/food/:id', async (req,res)=>{
+        const id=req.params.id;
+        const quary={_id:new ObjectId(id)}
+        console.log(quary)
+        const singleFood= await foodCollection.findOne(quary) 
+        res.send(singleFood)
+    })
+
+   
+
+
+    app.get('/user/:id', async (req,res)=>{
+        const id=req.params.id;
+        const quary={_id:new ObjectId(id)}
+        const user= await userCollection.findOne(quary) 
+        res.send(user)
+    })
 
     app.post("/food", async (req,res)=>{
         const newfood=req.body
@@ -55,9 +66,11 @@ async function run() {
         const result= await foodCollection.insertOne(newfood) 
         res.send(result)
     })
+
+   
     app.post("/user", async (req,res)=>{
         const newUser=req.body
-        console.log(newUser)
+        
         
         const result= await userCollection.insertOne(newUser) 
         res.send(result)
