@@ -35,6 +35,12 @@ async function run() {
         console.log(result)
         res.send(result)
     })
+    app.get('/myFoodRequest', async (req,res)=>{
+        const cursor=myFoodRequestCollection.find();
+        const result=await cursor.toArray();
+        console.log(result)
+        res.send(result)
+    })
     app.get('/user', async (req,res)=>{
         const cursor=userCollection.find();
         const result=await cursor.toArray();
