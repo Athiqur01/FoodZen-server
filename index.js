@@ -1,13 +1,23 @@
 const express=require('express');
 const cors=require('cors')
+const jwt=require('jsonwebtoken')
+const cookieParser=require('cookie-parser')
 const { MongoClient, ServerApiVersion,ObjectId } = require('mongodb');
 require('dotenv').config()
 const app=express()
 const port=process.env.PORT || 5014
 
 //middleware
-app.use(cors())
+
+app.use(cors({
+    origin:['http://localhost:5175'],
+    credentials:true
+}))
+
 app.use(express.json())
+app.use(cookieParser())
+
+
 
 // Database integration
 console.log(process.env.DB_PASS)
@@ -30,11 +40,23 @@ async function run() {
     const myFoodRequestCollection = client.db("codeZen").collection('myFoodRequest');
     
     app.get('/food', async (req,res)=>{
+        console.log('tookennn',req.cookies.token)
         const cursor=foodCollection.find();
+        
         const result=await cursor.toArray();
         console.log(result)
+        
         res.send(result)
     })
+
+    app.delete('/food/:id', async (req,res)=>{
+        const id=req.params.id;
+        const quary={_id:new ObjectId(id)}
+        console.log('deleted food',quary)
+        const deletedFood= await foodCollection.deleteOne(quary) 
+        res.send(deletedFood)
+    })
+
     app.get('/myFoodRequest', async (req,res)=>{
         const cursor=myFoodRequestCollection.find();
         const result=await cursor.toArray();
@@ -44,14 +66,12 @@ async function run() {
     app.get('/user', async (req,res)=>{
         const cursor=userCollection.find();
         const result=await cursor.toArray();
-        console.log(result)
         res.send(result)
     })
 
     app.get('/food/:id', async (req,res)=>{
         const id=req.params.id;
         const quary={_id:new ObjectId(id)}
-        console.log(quary)
         const singleFood= await foodCollection.findOne(quary) 
         res.send(singleFood)
     })
@@ -67,10 +87,10 @@ async function run() {
     })
 
     app.get('/foods/:email', async (req,res)=>{
-
+         const token=req.cookies?.token
+         console.log('tttttttt',token)
         const email=req.params.email;
         const quary={'donatorEmail':email}
-            console.log(quary)
         const singleFood= foodCollection.find(quary) 
         const result=await singleFood.toArray();
         res.send(result)
@@ -87,6 +107,7 @@ async function run() {
     })
 
     app.post("/food", async (req,res)=>{
+        console.log('tookennn',req.cookies.token)
         const newfood=req.body
         console.log(newfood)
         
@@ -94,11 +115,22 @@ async function run() {
         res.send(result)
     })
     app.post("/myFoodRequest", async (req,res)=>{
-        const newfood=req.body
-       
-        
+        const newfood=req.body 
         const result= await myFoodRequestCollection.insertOne(newfood) 
         res.send(result)
+    })
+
+    app.post('/jwt', async(req,res)=>{
+        const user=req.body
+        console.log(user)
+         const token=jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'365d'})
+        res
+        .cookie('token',token,{
+            httpOnly:true,
+            secure:false,
+            sameSite:'none'
+        })
+        .send({success:true})
     })
 
    
