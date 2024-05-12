@@ -61,7 +61,17 @@ async function run() {
         const email=req.params.email;
         const quary={userEmail:email}
         console.log(quary)
-        const singleFood= await myFoodRequestCollection.find(quary) 
+        const singleFood=  myFoodRequestCollection.find(quary) 
+        const result=await singleFood.toArray();
+        res.send(result)
+    })
+
+    app.get('/foods/:email', async (req,res)=>{
+
+        const email=req.params.email;
+        const quary={'donatorEmail':email}
+            console.log(quary)
+        const singleFood= foodCollection.find(quary) 
         const result=await singleFood.toArray();
         res.send(result)
     })
@@ -85,7 +95,7 @@ async function run() {
     })
     app.post("/myFoodRequest", async (req,res)=>{
         const newfood=req.body
-        console.log(newfood)
+       
         
         const result= await myFoodRequestCollection.insertOne(newfood) 
         res.send(result)
