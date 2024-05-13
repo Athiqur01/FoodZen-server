@@ -40,16 +40,15 @@ async function run() {
     const myFoodRequestCollection = client.db("codeZen").collection('myFoodRequest');
     
     app.get('/food', async (req,res)=>{
-        console.log('tookennn',req.cookies.token)
+        console.log('token from available foods',req.cookies.token)
         const cursor=foodCollection.find();
-        
         const result=await cursor.toArray();
-        console.log(result)
-        
         res.send(result)
     })
 
     app.delete('/food/:id', async (req,res)=>{
+        const token=req.cookies?.token
+         console.log('token from manage my food in delete operation',token)
         const id=req.params.id;
         const quary={_id:new ObjectId(id)}
         console.log('deleted food',quary)
@@ -78,6 +77,9 @@ async function run() {
 
     app.get('/myFoodRequest/:email', async (req,res)=>{
 
+        const token=req.cookies?.token
+         console.log('token my food request in get operation',token)
+
         const email=req.params.email;
         const quary={userEmail:email}
         console.log(quary)
@@ -88,7 +90,7 @@ async function run() {
 
     app.get('/foods/:email', async (req,res)=>{
          const token=req.cookies?.token
-         console.log('tttttttt',token)
+         console.log('token from manage food',token)
         const email=req.params.email;
         const quary={'donatorEmail':email}
         const singleFood= foodCollection.find(quary) 
@@ -107,7 +109,8 @@ async function run() {
     })
 
     app.post("/food", async (req,res)=>{
-        console.log('tookennn',req.cookies.token)
+        const token=req.cookies?.token
+         console.log('token from add food in post operation',token)
         const newfood=req.body
         console.log(newfood)
         
@@ -124,11 +127,12 @@ async function run() {
         const user=req.body
         console.log(user)
          const token=jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'365d'})
-        res
-        .cookie('token',token,{
-            httpOnly:true,
-            secure:false,
-            sameSite:'none'
+    
+        res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', 
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+
         })
         .send({success:true})
     })
